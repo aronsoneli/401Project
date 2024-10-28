@@ -290,7 +290,7 @@ ggplot(data_interactions, aes(x = x_factor_fp_z, y = exit_velo_mph_x.x)) +
 
 #new model with spine angle
 # Define model 6 with hitting side included as an interaction term
-meeModelSix <- lmer(bat_speed_mph_max_x.x ~ attack_angle_category * torso_angle_fp_z * hitter_side +
+meeModelSix <- lmer(bat_speed_mph_max_x.x ~ attack_angle_category * torso_angle_fp_z + hitter_side +
                       (1 | session.x), data = data_interactions)
 
 summary(meeModelSix)
