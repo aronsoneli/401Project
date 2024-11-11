@@ -9,6 +9,10 @@ The goal of this research is to highlight biomechanical interactions that baseba
 - The DrivelineBiomechanics and MLB Statcast files are where I produced my code
 - The exploratory findings are my initial investigations into other variables, such as attack angle.
 
+# Data
+- POI and Metadata are Driveline produced files
+- Stats (1) is all 2024 MLB hitters with at least 200 PA from MLB Statcast
+
 # Variables of Interest
 - 'exit_velo_mph_x' : exit velocity (miles per hour)
 - 'blast_bat_speed_mph_x' : bat speed at contact as measured by Blast Motion sensor (miles per hour)
