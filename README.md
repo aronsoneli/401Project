@@ -4,6 +4,8 @@ Driveline/MLB data
 # Problem Statement
 The goal of this research is to highlight biomechanical interactions that baseball hitters demonstrate to affect bat speed, an already proven metric that positively impacts performance. In doing so, I will attempt to distinguish potential differences between different sequencing types, body masses, right-handed and left-handed hitters to determine if certain biomechanics should be altered. Using findings from the OpenBiomechanics Driveline data, I took bat speed findings and applied them to MLB data from Baseball Savant.
 
+# R Files
+- All data manipulation can be found in the explore folder. 
 
 # Variables of Interest
 - 'exit_velo_mph_x' : exit velocity (miles per hour)
