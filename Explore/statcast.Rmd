@@ -1,0 +1,116 @@
+---
+title: "statcast"
+author: "Eli Aronson"
+date: "2024-12-23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+statcast <- read.csv('stats (1).csv')
+library(tidyverse)
+library(ggplot2)
+library(Metrics)
+library(Lahman)
+```
+
+
+```{r}
+player_weights_heights <- People[, c("playerID", "nameFirst", "nameLast", "weight", "height")]
+People$Name <- paste(People$nameLast, People$nameFirst, sep = ", ")
+
+statcast <- merge(statcast, People[, c("Name", "height", "weight")],
+                  by.x = "last_name..first_name", by.y = "Name", all.x = TRUE)
+# statcast <- statcast %>%
+#   select(-Height.inches., -Weight.pounds.)
+
+statcast_clean <- na.omit(statcast)
+
+colnames(statcast_clean)
+```
+
+```{r}
+ggplot(statcast_clean, aes(x = avg_swing_speed, y = exit_velocity_avg)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm", color = "red", se = TRUE) +
+  labs(title = "MLB Bat Speed vs Exit Velocity", x = "Average Bat Speed (mph)", y = "Average Exit Velocity (mph)")
+
+# Scatter plot of weight vs. bat speed
+ggplot(statcast_clean, aes(x = weight, y = avg_swing_speed)) +
+  geom_point(color = "blue", alpha = 0.6) +  # Scatter plot points
+  geom_smooth(method = "lm", color = "red", linetype = "dashed") +  # Linear trend line
+  labs(title = "Relationship Between Weight and Bat Speed in MLB",
+       x = "Weight (lbs)",
+       y = "Bat Speed (mph)") +
+  theme_minimal() 
+```
+
+
+
+```{r}
+#Linear model to see the impact on bat speed
+lm_model <- lm(avg_swing_speed ~ weight + xwoba + xiso + avg_swing_length + barrel_batted_rate + hard_hit_percent, 
+               data = statcast_clean)
+summary(lm_model)
+plot(lm_model)
+
+
+#Linear interaction model between weight and swing length
+lm_interaction_model <- lm(avg_swing_speed ~ weight * avg_swing_length + xwoba + xiso + barrel_batted_rate + hard_hit_percent, 
+                           data = statcast_clean)
+summary(lm_interaction_model)
+#No difference
+
+```
+
+
+```{r}
+#Polynomial model for non linear effects
+lm_poly <- lm(avg_swing_speed ~ poly(weight, 2) + xwoba + xiso + avg_swing_length + barrel_batted_rate + hard_hit_percent, 
+              data = statcast_clean)
+summary(lm_poly)
+```
+
+
+```{r}
+set.seed(123)
+train_index <- sample(1:nrow(statcast_clean), 0.8 * nrow(statcast_clean))
+train_data <- statcast_clean[train_index, ]
+test_data <- statcast_clean[-train_index, ]
+
+
+
+# Example for Linear Model
+predicted <- predict(lm_model, newdata = test_data)
+mse <- mse(test_data$avg_swing_speed, predicted)
+rmse <- rmse(test_data$avg_swing_speed, predicted)
+r2 <- cor(test_data$avg_swing_speed, predicted)^2
+
+cat("MSE:", mse, "RMSE:", rmse, "R^2:", r2)
+
+ggplot(test_data, aes(x = avg_swing_speed, y = predicted)) +
+  geom_point(alpha = 0.6) +
+  geom_abline(slope = 1, intercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Predicted vs Actual Bat Speed", x = "Actual Bat Speed", y = "Predicted Bat Speed") +
+  theme_minimal()
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
